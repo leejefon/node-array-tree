@@ -1,0 +1,22 @@
+{
+  "name": "ArrayTree",
+  "version": "1.0.0",
+  "description": "Array Tree data structure",
+  "author": "Jeff Lee <leejefon@gmail.com>",
+  "homepage": "https://github.com/leejefon/node-array-tree",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leejefon/node-array-tree"
+  },
+  "bugs": {
+    "url": "https://github.com/leejefon/node-array-tree/issues"
+  },
+  "scripts": {
+    "test": "mocha test test.js"
+  },
+  "dependencies": {
+    "underscore": "^1.7.0"
+  }
+}
