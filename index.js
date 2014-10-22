@@ -1,7 +1,6 @@
 /**
  * ArrayTree
  *
- * @description ::
  * @author      :: Jeff Lee
  * @created     :: 2014/10/22
  */
