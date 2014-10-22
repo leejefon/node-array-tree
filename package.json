@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Array Tree data structure",
   "author": "Jeff Lee <leejefon@gmail.com>",
-  "homepage": "https://github.com/leejefon/node-array-tree",
   "license": "MIT",
   "main": "index.js",
   "repository": {
