@@ -20,15 +20,15 @@ module.exports = (function () {
     ArrayTree.prototype.addChild = function (node, parentId) {
         if (!parentId) {
             this.data.push(node);
-        } else {
-            if (!this.findAndInsert({ id: parentId }, node)) {
-                this.tempData.push({ data: node, pid: parentId });
-            }
 
             var t = checkTempDataParent(node.id, this.tempData);
             if (t !== -1) {
-                this.data.findAndInsert({ id: node.id }, this.tempData[t].data);
+                this.data.findAndInsert({ id: node.id }, this.tempData[t].data, this.config);
                 delete this.tempData[t];
+            }
+        } else {
+            if (!this.findAndInsert({ id: parentId }, node, this.config)) {
+                this.tempData.push({ data: node, pid: parentId });
             }
         }
     };
@@ -42,11 +42,11 @@ module.exports = (function () {
     };
 
     ArrayTree.prototype.search = function (keyObj) {
-        return this.data.findAndInsert(keyObj, null);
+        return this.data.findAndInsert(keyObj, null, {});
     };
 
     // http://jsfiddle.net/leejefon/xzg1hbkk/
-    Object.prototype.findAndInsert = function (keyObj, node) {
+    Object.prototype.findAndInsert = function (keyObj, node, params) {
         var key, val, tRet;
         for (var p in keyObj) {
             if (keyObj.hasOwnProperty(p)) {
@@ -59,13 +59,16 @@ module.exports = (function () {
             if (p == key) {
                 if (this[p] == val) {
                     if (node) {
-                        this['children'].push(node);
+                        if (!this[params.childrenName]) {
+                            this[params.childrenName] = [];
+                        }
+                        this[params.childrenName].push(node);
                     }
                     return this.data;
                 }
             } else if (this[p] instanceof Object) {
                 if (this.hasOwnProperty(p)) {
-                    tRet = this[p].findAndInsert(keyObj, node);
+                    tRet = this[p].findAndInsert(keyObj, node, params);
                     if (tRet) { return tRet; }
                 }
             }
@@ -76,7 +79,7 @@ module.exports = (function () {
 
     function checkTempDataParent (id, data) {
         for (var i = 0; i < data.length; i++) {
-            if (data[i].parentId === id) {
+            if (data[i].pid === id) {
                 return i;
             }
         }
