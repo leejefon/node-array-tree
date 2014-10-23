@@ -64,9 +64,11 @@ module.exports = (function () {
                         }
                         data[params.childrenName].push(child);
                     } else if (action === 'update') {
-
+                        for (var c in child) {
+                            data[c] = child[c];
+                        }
                     } else if (action === 'delete') {
-                        // Can't find a good way to delete atm
+                        return 'DELETE';
                     } else { // search
                         return data;
                     }
@@ -74,7 +76,11 @@ module.exports = (function () {
             } else if (data[q] instanceof Object) {
                 if (data.hasOwnProperty(q)) {
                     tRet = findThenAction(data[q], query, action, child, params);
-                    if (tRet) { return tRet; }
+                    if (tRet === 'DELETE' && action === 'delete') {
+                        delete data[q];
+                        data.splice(q, 1);
+                        return true;
+                    } else if (tRet) { return tRet; }
                 }
             }
         }

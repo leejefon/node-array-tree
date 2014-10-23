@@ -34,7 +34,7 @@ describe('ArrayTree', function () {
     });
 
     describe('Update items', function () {
-        xit('should update child 4', function () {
+        it('should update child 4', function () {
             var tree = new ArrayTree();
 
             tree.addChild({ id: '3' });
@@ -47,7 +47,7 @@ describe('ArrayTree', function () {
     });
 
     describe('Delete items', function () {
-        xit('should delete child 4', function () {
+        it('should delete child 4', function () {
             var tree = new ArrayTree();
 
             tree.addChild({ id: '3' });
