@@ -23,30 +23,30 @@ module.exports = (function () {
 
             var t = checkTempDataParent(child.id, this.tempData);
             if (t !== -1) {
-                this.data.findThenAction({ id: child.id }, 'insert', this.tempData[t].data, this.config);
+                findThenAction(this.data, { id: child.id }, 'insert', this.tempData[t].data, this.config);
                 delete this.tempData[t];
             }
         } else {
-            if (!this.findThenAction({ id: parentId }, 'insert', child, this.config)) {
+            if (!findThenAction(this.data, { id: parentId }, 'insert', child, this.config)) {
                 this.tempData.push({ data: child, pid: parentId });
             }
         }
     };
 
     ArrayTree.prototype.updateChild = function (query, data) {
-        return this.data.findThenAction(query, 'update', data);
+        return findThenAction(this.data, query, 'update', data);
     };
 
     ArrayTree.prototype.removeChild = function (query) {
-        return this.data.findThenAction(query, 'delete');
+        return findThenAction(this.data, query, 'delete');
     };
 
     ArrayTree.prototype.search = function (query) {
-        return this.data.findThenAction(query, 'search');
+        return findThenAction(this.data, query, 'search');
     };
 
     // http://jsfiddle.net/leejefon/xzg1hbkk/
-    Object.prototype.findThenAction = function (query, action, child, params) {
+    function findThenAction (data, query, action, child, params) {
         var key, val, tRet;
         for (var q in query) {
             if (query.hasOwnProperty(q)) {
@@ -55,32 +55,32 @@ module.exports = (function () {
             }
         }
 
-        for (var q in this) {
+        for (var q in data) {
             if (q == key) {
-                if (this[q] == val) {
+                if (data[q] == val) {
                     if (action === 'insert') {
-                        if (!this[params.childrenName]) {
-                            this[params.childrenName] = [];
+                        if (!data[params.childrenName]) {
+                            data[params.childrenName] = [];
                         }
-                        this[params.childrenName].push(child);
+                        data[params.childrenName].push(child);
                     } else if (action === 'update') {
 
                     } else if (action === 'delete') {
                         // Can't find a good way to delete atm
                     } else { // search
-                        return this;
+                        return data;
                     }
                 }
-            } else if (this[q] instanceof Object) {
-                if (this.hasOwnProperty(q)) {
-                    tRet = this[q].findThenAction(query, action, child, params);
+            } else if (data[q] instanceof Object) {
+                if (data.hasOwnProperty(q)) {
+                    tRet = findThenAction(data[q], query, action, child, params);
                     if (tRet) { return tRet; }
                 }
             }
         }
 
         return false;
-    };
+    }
 
     function checkTempDataParent (id, data) {
         for (var i = 0; i < data.length; i++) {
