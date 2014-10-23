@@ -17,58 +17,63 @@ module.exports = (function () {
         this.tempData = [];
     };
 
-    ArrayTree.prototype.addChild = function (node, parentId) {
+    ArrayTree.prototype.addChild = function (child, parentId) {
         if (!parentId) {
-            this.data.push(node);
+            this.data.push(child);
 
-            var t = checkTempDataParent(node.id, this.tempData);
+            var t = checkTempDataParent(child.id, this.tempData);
             if (t !== -1) {
-                this.data.findAndInsert({ id: node.id }, this.tempData[t].data, this.config);
+                this.data.findThenAction({ id: child.id }, 'insert', this.tempData[t].data, this.config);
                 delete this.tempData[t];
             }
         } else {
-            if (!this.findAndInsert({ id: parentId }, node, this.config)) {
-                this.tempData.push({ data: node, pid: parentId });
+            if (!this.findThenAction({ id: parentId }, 'insert', child, this.config)) {
+                this.tempData.push({ data: child, pid: parentId });
             }
         }
     };
 
-    ArrayTree.prototype.updateChild = function () {
-
+    ArrayTree.prototype.updateChild = function (query, data) {
+        return this.data.findThenAction(query, 'update', data);
     };
 
-    ArrayTree.prototype.removeChild = function () {
-
+    ArrayTree.prototype.removeChild = function (query) {
+        return this.data.findThenAction(query, 'delete');
     };
 
-    ArrayTree.prototype.search = function (keyObj) {
-        return this.data.findAndInsert(keyObj, null, {});
+    ArrayTree.prototype.search = function (query) {
+        return this.data.findThenAction(query, 'search');
     };
 
     // http://jsfiddle.net/leejefon/xzg1hbkk/
-    Object.prototype.findAndInsert = function (keyObj, node, params) {
+    Object.prototype.findThenAction = function (query, action, child, params) {
         var key, val, tRet;
-        for (var p in keyObj) {
-            if (keyObj.hasOwnProperty(p)) {
-                key = p;
-                val = keyObj[p];
+        for (var q in query) {
+            if (query.hasOwnProperty(q)) {
+                key = q;
+                val = query[q];
             }
         }
 
-        for (var p in this) {
-            if (p == key) {
-                if (this[p] == val) {
-                    if (node) {
+        for (var q in this) {
+            if (q == key) {
+                if (this[q] == val) {
+                    if (action === 'insert') {
                         if (!this[params.childrenName]) {
                             this[params.childrenName] = [];
                         }
-                        this[params.childrenName].push(node);
+                        this[params.childrenName].push(child);
+                    } else if (action === 'update') {
+
+                    } else if (action === 'delete') {
+                        // Can't find a good way to delete atm
+                    } else { // search
+                        return this;
                     }
-                    return this.data;
                 }
-            } else if (this[p] instanceof Object) {
-                if (this.hasOwnProperty(p)) {
-                    tRet = this[p].findAndInsert(keyObj, node, params);
+            } else if (this[q] instanceof Object) {
+                if (this.hasOwnProperty(q)) {
+                    tRet = this[q].findThenAction(query, action, child, params);
                     if (tRet) { return tRet; }
                 }
             }
@@ -88,5 +93,4 @@ module.exports = (function () {
     }
 
     return ArrayTree;
-
 })();
